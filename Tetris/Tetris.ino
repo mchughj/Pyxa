@@ -42,7 +42,7 @@
 #define Pyxa_DC     8
 
 // Songs used in the game
-const char tetrisStartSond[] PROGMEM = "Tetris:d=4,o=5,b=150:e6,8b,8c6,8d6,16e6,16d6,8c6,8b,a,8a,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,2a,8p,d6,8f6,a6,8g6,8f6,e6,8e6,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,a";
+const char tetrisStartSound[] PROGMEM = "Tetris:d=4,o=5,b=150:e6,8b,8c6,8d6,16e6,16d6,8c6,8b,a,8a,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,2a,8p,d6,8f6,a6,8g6,8f6,e6,8e6,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,a";
 const char gameBeginSound[] PROGMEM = "B:d=4,o=5,b=400:8b,2e..6";
 const char clearLineSound[] PROGMEM = "ClearLine:d=8,o=6,b=500:c,e,d7,c,e,a#,c,e,a";
 const char hitBottomSound[] PROGMEM = "SmallBeep:d=8,o=6,b=500:4d";
