@@ -8,7 +8,7 @@
 // A small program to try out music effects given to me by Kellen.
 //
 // Required libraries:
-//   https://github.com/cefn/non-blocking-rtttl-arduino
+//   https://github.com/mchughj/non-blocking-rtttl-arduino
 //   https://github.com/adafruit/Adafruit-GFX-Library
 //   https://github.com/adafruit/Adafruit-ST7735-Library
 // 
