@@ -8,7 +8,7 @@
 // A small program to try out music effects given to me by Kellen.
 //
 // Required libraries:
-//   https://github.com/ponty/arduino-rtttl-player
+//   https://github.com/cefn/non-blocking-rtttl-arduino
 //   https://github.com/adafruit/Adafruit-GFX-Library
 //   https://github.com/adafruit/Adafruit-ST7735-Library
 // 
@@ -18,7 +18,7 @@
 #include <SPI.h>
 #include <Event.h>
 #include <Timer.h>
-#include <rtttl.h>
+#include <rtttl-nonblocking.h>
 
 // Pins used in the display 
 #define Pyxa_CS     10
@@ -45,11 +45,10 @@ Adafruit_ST7735 Pyxa = Adafruit_ST7735(Pyxa_CS,  Pyxa_DC, Pyxa_RST);
 #define SW   128 // Screen width
 #define SH   160 // Screen height
 
-Rtttl soundPlayer;
+ProgmemPlayer soundPlayer(A1);
 
 void setup() {
   Serial.begin(9600);
-  soundPlayer.begin(A1);
 
   pinMode(A1, OUTPUT); // Buzzer is connected to A1 pin
 
@@ -91,13 +90,25 @@ void setup() {
   Pyxa.print( " to cancel");
 }
 
+bool playing = false;
+
 void loop() {
-  if (digitalRead(A_BUTTON) == 0) { 
-    soundPlayer.play_P(megalovania);  
-    delay(1000);
-  } else if( digitalRead(B_BUTTON) == 0) { 
-    soundPlayer.play_P(tetris);  
-    delay(1000);
+  if (digitalRead(X_BUTTON) == 0 && digitalRead(Y_BUTTON) == 0 && playing) { 
+    playing = false;
+    soundPlayer.silence();
+    delay(2000);
+  }
+  if (playing == false && digitalRead(A_BUTTON) == 0) { 
+    soundPlayer.setSong(megalovania);  
+    playing = true;
+  } else if( playing == false && digitalRead(B_BUTTON) == 0) { 
+    soundPlayer.setSong(tetris);  
+    playing = true;
+  }
+  if (playing) { 
+    if (!soundPlayer.stepSong()) { 
+      playing = false;
+    }
   }
 }
 
