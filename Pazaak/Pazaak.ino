@@ -46,6 +46,151 @@ Adafruit_ST7735 Pyxa = Adafruit_ST7735(Pyxa_CS,  Pyxa_DC, Pyxa_RST);
 #define SW   128 // Screen width
 #define SH   160 // Screen height
 
+// Screen layout
+//   +--------------+
+//   |    Players   |
+//   |     Hand     |   40 Pixels
+//   +--------------+
+//   |    Current   |   60 Pixels
+//   |     Round    |
+//   +--------------+
+//   |    Current   |   20 Pixels
+//   |     score    |
+//   +--------------+   
+//   | Instructions |   40 Pixels
+//   +--------------+
+
+// Player's hand:
+//   Need to show 4 cards
+//   Assume need buffer on the top and bottom of 3 pixels each.
+//   Assume that space is dilineated between areas by a line.
+//   7 pixels out so 33 pixels.
+//   Make a card 26 pixels by 26 pixels.  4 * 26 = 104 pixels wide.
+//   Assume that there is 2 pixels on both sides of each card.  
+//
+//   |  +--------------------------+    +--------------------------+   +--------------------------+   +------ ...
+//   |  |                          |    |                          |   |                          |   |       ...
+//   |  |                          |    |                          |   |                          |   |       ...
+//   |  |            X             |    |                          |   |      X                   |   |       ...
+//   |  |            X             |    |                          |   |      X                   |   |       ...
+//   |  |            X             |    |                          |   |      X          X        |   |       ...
+//   |  |       xxxxxxxxxxx        |    |        xxxxxxxxxxx       |   |   xxxxxxx      X         |   |       ...
+//   |  |            X             |    |                          |   |      X        X          |   |       ...
+//   |  |            X             |    |                          |   |      X       X           |   |       ...
+//   |  |            X             |    |                          |   |      X      X    xxxxxx  |   |       ...
+//   |  |                          |    |                          |   |            X             |   |       ...
+//   |  |                          |    |                          |   |           X              |   |       ...
+//   |  |                          |    |                          |   |                          |   |       ...
+//   |  |          xxx             |    |         xxxxxx           |   |           xxxxx          |   |       ...
+//   |  |         x  X             |    |        x      x          |   |          x     x         |   |       ...
+//   |  |        x   X             |    |                x         |   |                 x        |   |       ...
+//   |  |            X             |    |                x         |   |                x         |   |       ...
+//   |  |            X             |    |               x          |   |           xxxxx          |   |       ...
+//   |  |            X             |    |              x           |   |               x          |   |       ...
+//   |  |            X             |    |            x             |   |                x         |   |       ...
+//   |  |            X             |    |           x              |   |                 x        |   |       ...
+//   |  |            X             |    |          x               |   |                 x        |   |       ...
+//   |  |         XXXXXXX          |    |        xxxxxxxxxx        |   |          x     x         |   |       ...
+//   |  |                          |    |                          |   |           xxxxx          |   |       ...
+//   |  |                          |    |                          |   |                          |   |       ...
+//   |  +--------------------------+    +--------------------------+   +--------------------------+   +------ ...
+//   
+//  
+//   +-------------+
+//   | C1 C2 C3 C4 |   Player's hand
+//   +-------------+
+//   Top left:  C1 - 2,6 -> 28,32 
+//   Top left:  C2 - 32,6 -> 58, 32
+//   Top left:  C3 - 62,6 -> 88, 32
+//   Top left:  C4 - 92,6 -> 118, 32
+//  Not quite right.
+
+// +--------------------------------------------------------------------------------------------------------------------------------+
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// |                                                                                                                                |
+// +--------------------------------------------------------------------------------------------------------------------------------+
+
+
+
+
 // Different types of cards in the game
 #define CARD_NONE 0
 #define CARD_PLUS1 1
@@ -117,19 +262,52 @@ int CARD_SHAPES[1][2][8] = {
 }
 };
 
-bool isCardBitSet(uint8_t cardType, uint8_t cardRotation, int x, int y) { 
-  byte bitRow = CARD_SHAPES[cardType][cardRotation][y];
+bool isCardBitSet(uint8_t cardShellType, uint8_t cardRotation, int x, int y) { 
+  byte bitRow = CARD_SHAPES[cardShellType][cardRotation][y];
   return (1 << x) & bitRow;
 }
 
-void drawCard(uint8_t cardType, uint8_t cardRotation, uint8_t windowX, uint8_t windowY, uint16_t color) {
+void drawCardShell(uint8_t cardShellType, uint8_t cardRotation, uint8_t windowX, uint8_t windowY, uint16_t color) {
   for (uint8_t y = 0; y < 8; y++) {
     for (uint8_t x = 0; x < 8; x++) {
-      if (isCardBitSet(cardType, cardRotation, x, y)) {
+      if (isCardBitSet(cardShellType, cardRotation, x, y)) {
         Pyxa.drawPixel(windowX + x, windowY + y, color);
       }
     }
   }
+}
+
+void drawCard(uint8_t cardType, uint8_t cardRotation, uint8_t windowX, uint8_t windowY, uint16_t color) {
+  drawCardShell(0, cardRotation, windowX, windowY, color);
+  Pyxa.setTextColor(color);
+  Pyxa.setTextSize(0);
+  Pyxa.setCursor(windowX + 2, windowY + 7);
+  switch (cardType) { 
+    case CARD_PLUS1: Pyxa.print( "+1" );break;
+    case CARD_PLUS2: Pyxa.print( "+2" );break;
+    case CARD_PLUS3: Pyxa.print( "+3" );break;
+    case CARD_PLUS4: Pyxa.print( "+4" );break;
+    case CARD_PLUS5: Pyxa.print( "+5" );break;
+    case CARD_PLUS6: Pyxa.print( "+6" );break;
+    case CARD_MINUS1: Pyxa.print( "-1" );break;
+    case CARD_MINUS2: Pyxa.print( "-2" );break;
+    case CARD_MINUS3: Pyxa.print( "-3" );break;
+    case CARD_MINUS4: Pyxa.print( "-4" );break;
+    case CARD_MINUS5: Pyxa.print( "-5" );break;
+    case CARD_MINUS6: Pyxa.print( "-6" );break;
+    case CARD_PLUSORMINUS1: Pyxa.print( "+/-1" );break;
+    case CARD_PLUSORMINUS2: Pyxa.print( "+/-2" );break;
+    case CARD_PLUSORMINUS3: Pyxa.print( "+/-3" );break;
+    case CARD_PLUSORMINUS4: Pyxa.print( "+/-4" );break;
+    case CARD_PLUSORMINUS5: Pyxa.print( "+/-5" );break;
+    case CARD_PLUSORMINUS6: Pyxa.print( "+/-6" );break;
+    case CARD_PLUSORMINUS1Or2: Pyxa.print( "+/- 1-2" );break;
+    case CARD_FLIP2SAND4S: Pyxa.print( "F2/4" );break;
+    case CARD_DOUBLE: Pyxa.print( "*2" );break;
+    case CARD_NONE:
+      break;
+  }
+
 }
 
 void setup() {
