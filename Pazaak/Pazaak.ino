@@ -46,7 +46,7 @@ Adafruit_ST7735 Pyxa = Adafruit_ST7735(Pyxa_CS,  Pyxa_DC, Pyxa_RST);
 #define SW   128 // Screen width
 #define SH   160 // Screen height
 
-// Screen layout
+// Main game screen layout
 //   +--------------+
 //   |    Players   |
 //   |     Hand     |   40 Pixels
@@ -60,135 +60,60 @@ Adafruit_ST7735 Pyxa = Adafruit_ST7735(Pyxa_CS,  Pyxa_DC, Pyxa_RST);
 //   | Instructions |   40 Pixels
 //   +--------------+
 
-// Player's hand:
+// For the Player's hand component of the screen I have 128x40 pixels 
+// to work with.
 //   Need to show 4 cards
-//   Assume need buffer on the top and bottom of 3 pixels each.
-//   Assume that space is dilineated between areas by a line.
-//   7 pixels out so 33 pixels.
+//   Vertical size 
+//      Assume need buffer on the top and bottom of 3 pixels each.
+//      Assume that space is dilineated between areas by a line.
+//      Given buffer space of 3 + 3 + 1 = 33 pixels maximum height of card.
 //   Make a card 26 pixels by 26 pixels.  4 * 26 = 104 pixels wide.
 //   Assume that there is 2 pixels on both sides of each card.  
+//   Total width = 2 + 26 + 2 + 2 + 26 + 2 + 2 + 26 + 2 + 2 + 26 + 2 = 104 + 16 = 120
 //
-//   |  +--------------------------+    +--------------------------+   +--------------------------+   +------ ...
-//   |  |                          |    |                          |   |                          |   |       ...
-//   |  |                          |    |                          |   |                          |   |       ...
-//   |  |            X             |    |                          |   |      X                   |   |       ...
-//   |  |            X             |    |                          |   |      X                   |   |       ...
-//   |  |            X             |    |                          |   |      X          X        |   |       ...
-//   |  |       xxxxxxxxxxx        |    |        xxxxxxxxxxx       |   |   xxxxxxx      X         |   |       ...
-//   |  |            X             |    |                          |   |      X        X          |   |       ...
-//   |  |            X             |    |                          |   |      X       X           |   |       ...
-//   |  |            X             |    |                          |   |      X      X    xxxxxx  |   |       ...
-//   |  |                          |    |                          |   |            X             |   |       ...
-//   |  |                          |    |                          |   |           X              |   |       ...
-//   |  |                          |    |                          |   |                          |   |       ...
-//   |  |          xxx             |    |         xxxxxx           |   |           xxxxx          |   |       ...
-//   |  |         x  X             |    |        x      x          |   |          x     x         |   |       ...
-//   |  |        x   X             |    |                x         |   |                 x        |   |       ...
-//   |  |            X             |    |                x         |   |                x         |   |       ...
-//   |  |            X             |    |               x          |   |           xxxxx          |   |       ...
-//   |  |            X             |    |              x           |   |               x          |   |       ...
-//   |  |            X             |    |            x             |   |                x         |   |       ...
-//   |  |            X             |    |           x              |   |                 x        |   |       ...
-//   |  |            X             |    |          x               |   |                 x        |   |       ...
-//   |  |         XXXXXXX          |    |        xxxxxxxxxx        |   |          x     x         |   |       ...
-//   |  |                          |    |                          |   |           xxxxx          |   |       ...
-//   |  |                          |    |                          |   |                          |   |       ...
-//   |  +--------------------------+    +--------------------------+   +--------------------------+   +------ ...
+//   |  +--------------------------+    +--------------------------+    +--------------------------+   +------ ...
+//   |  |                          |    |                          |    |                          |   |       ...
+//   |  |                          |    |                          |    |                          |   |       ...
+//   |  |            X             |    |                          |    |      X                   |   |       ...
+//   |  |            X             |    |                          |    |      X                   |   |       ...
+//   |  |            X             |    |                          |    |      X          X        |   |       ...
+//   |  |       xxxxxxxxxxx        |    |        xxxxxxxxxxx       |    |   xxxxxxx      X         |   |       ...
+//   |  |            X             |    |                          |    |      X        X          |   |       ...
+//   |  |            X             |    |                          |    |      X       X           |   |       ...
+//   |  |            X             |    |                          |    |      X      X    xxxxxx  |   |       ...
+//   |  |                          |    |                          |    |            X             |   |       ...
+//   |  |                          |    |                          |    |           X              |   |       ...
+//   |  |                          |    |                          |    |                          |   |       ...
+//   |  |          xxx             |    |         xxxxxx           |    |           xxxxx          |   |       ...
+//   |  |         x  X             |    |        x      x          |    |          x     x         |   |       ...
+//   |  |        x   X             |    |                x         |    |                 x        |   |       ...
+//   |  |            X             |    |                x         |    |                x         |   |       ...
+//   |  |            X             |    |               x          |    |           xxxxx          |   |       ...
+//   |  |            X             |    |              x           |    |               x          |   |       ...
+//   |  |            X             |    |            x             |    |                x         |   |       ...
+//   |  |            X             |    |           x              |    |                 x        |   |       ...
+//   |  |            X             |    |          x               |    |                 x        |   |       ...
+//   |  |         XXXXXXX          |    |        xxxxxxxxxx        |    |          x     x         |   |       ...
+//   |  |                          |    |                          |    |           xxxxx          |   |       ...
+//   |  |                          |    |                          |    |                          |   |       ...
+//   |  +--------------------------+    +--------------------------+    +--------------------------+   +------ ...
 //   
 //  
 //   +-------------+
 //   | C1 C2 C3 C4 |   Player's hand
 //   +-------------+
-//   Top left:  C1 - 2,6 -> 28,32 
-//   Top left:  C2 - 32,6 -> 58, 32
-//   Top left:  C3 - 62,6 -> 88, 32
-//   Top left:  C4 - 92,6 -> 118, 32
-//  Not quite right.
+// 
+//  Offset the first x by 4 pixels:
+//   Top left:  C1 - 6,6 -> 32,32 
+//   Top left:  C2 - 36,6 -> 62, 32
+//   Top left:  C3 - 66,6 -> 92, 32
+//   Top left:  C4 - 96,6 -> 122, 32
+//  Perfect!
 
-// +--------------------------------------------------------------------------------------------------------------------------------+
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// |                                                                                                                                |
-// +--------------------------------------------------------------------------------------------------------------------------------+
-
-
+//
+// Numeric values:
+//
+//  
 
 
 // Different types of cards in the game
